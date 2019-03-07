@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.MVC.Web.Models;
+using TaskManager.MVC.Web.ViewModels;
 
 namespace TaskManager.MVC.Web.Controllers
 {
@@ -23,11 +24,11 @@ namespace TaskManager.MVC.Web.Controllers
             if(userName != null)
             {
                 ViewData["UserName"] = userName;
+                ViewData["UserId"] = userId;
             }
             return View(await _context.Tasks.ToListAsync());
         }
 
-        // GET: Task/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,24 +46,30 @@ namespace TaskManager.MVC.Web.Controllers
             return View(taskModel);
         }
 
-        // GET: Task/Create
-        public IActionResult Create()
+        public IActionResult Create(int userId, string userName)
         {
+            ViewData["UserName"] = userName;
+            ViewData["UserId"] = userId;
             return View();
         }
 
-        // POST: Task/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Description,Owner,Status,Tag,Type,CreateTime")] TaskModel taskModel)
+        public async Task<IActionResult> Create(UpdateTaskViewModel taskModel, int userId, string userName)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(taskModel);
+                _context.Add(new TaskModel()
+                {
+                    CreateTime = DateTime.Now,
+                    Description = taskModel.Description,
+                    Owner = userId,
+                    Status = taskModel.Status,
+                    Tag = taskModel.Tag,
+                    Type = taskModel.Type
+                });
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { userId, userName });
             }
             return View(taskModel);
         }

@@ -42,8 +42,9 @@ namespace TaskManager.MVC.Web.Controllers
             if (ModelState.IsValid)
             {
                 var users = from user in _context.Users select user;
-                if (users.FirstOrDefault(user => user.UserName == model.UserName && user.Password == model.Password) != null)
-                    return RedirectToAction("Index", "Task", new { userId = model.Id, userName = model.UserName });
+                var current = users.FirstOrDefault(user => user.UserName == model.UserName && user.Password == model.Password);
+                if (current != null)
+                    return RedirectToAction("Index", "Task", new { userId = current.Id, userName = current.UserName });
             }
 
             return View(model);
@@ -65,13 +66,14 @@ namespace TaskManager.MVC.Web.Controllers
             if (ModelState.IsValid)
             {
                 var users = from user in _context.Users select user;
-                if (users.FirstOrDefault(user => user.UserName == model.UserName) != null)
+                var current = users.FirstOrDefault(user => user.UserName == model.UserName);
+                if (current != null)
                 {
                     return Register("UserName exist!");
                 }
                 _context.Add(model);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Task", new { userId = model.Id, userName = model.UserName });
+                return RedirectToAction("Index", "Task", new { userId = current.Id, userName = current.UserName });
             }
 
             return View(model);
