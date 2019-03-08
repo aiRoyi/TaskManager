@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using TaskManager.MVC.Web.Repositories;
+using TaskManager.MVC.Web.Session;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace TaskManager.MVC.Web
 {
@@ -37,6 +40,12 @@ namespace TaskManager.MVC.Web
 
             services.AddDbContext<TaskContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("TaskContext")));
+
+            services.AddSession();
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped<IAdminSession, AdminSession>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,7 +65,8 @@ namespace TaskManager.MVC.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            app.UseStaticFiles();
+            app.UseSession();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

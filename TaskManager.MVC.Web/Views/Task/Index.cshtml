@@ -9,6 +9,14 @@
 <p>
     <a asp-action="Create" asp-route-userId=@ViewData["UserId"] asp-route-userName=@ViewData["UserName"]>Create New</a>
 </p>
+
+<form asp-action="Index" asp-route-userId=@ViewData["UserId"] asp-route-userName=@ViewData["UserName"] class="form-horizontal" role="form">
+    <p>
+        Search By Type: @Html.TextBox("SearchString") <br />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
 <table class="table">
     <thead>
         <tr>
@@ -34,32 +42,33 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Owner)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tag)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateTime)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Owner)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Tag)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreateTime)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-userId=@ViewData["UserId"] asp-route-userName=@ViewData["UserName"] asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-userId=@ViewData["UserId"] asp-route-userName=@ViewData["UserName"] asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-userId=@ViewData["UserId"] asp-route-userName=@ViewData["UserName"] asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -7,6 +7,8 @@ namespace TaskManager.MVC.Web.ViewModels
 {
     public class UpdateTaskViewModel
     {
+        public int Id { get; set; }
+
         public string Description { get; set; }
 
         public TaskStatus Status { get; set; }

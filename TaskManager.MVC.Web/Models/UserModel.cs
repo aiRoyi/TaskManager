@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace TaskManager.MVC.Web.Models
 {
+    [Serializable]
     public class UserModel
     {
         public int Id { get; set; }

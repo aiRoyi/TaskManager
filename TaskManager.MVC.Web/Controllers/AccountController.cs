@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManager.MVC.Web.Models;
+using TaskManager.MVC.Web.Repositories;
+using TaskManager.MVC.Web.Session;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,11 +11,14 @@ namespace TaskManager.MVC.Web.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly TaskContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public AccountController(TaskContext context)
+        private readonly IAdminSession _adminSession;
+
+        public AccountController(IUserRepository repository, IAdminSession adminSession)
         {
-            _context = context;
+            _userRepository = repository;
+            _adminSession = adminSession;
         }
 
         public IActionResult Index()
@@ -41,12 +42,13 @@ namespace TaskManager.MVC.Web.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var users = from user in _context.Users select user;
-                var current = users.FirstOrDefault(user => user.UserName == model.UserName && user.Password == model.Password);
-                if (current != null)
-                    return RedirectToAction("Index", "Task", new { userId = current.Id, userName = current.UserName });
+                if(_userRepository.IsValid(model.UserName, model.Password))
+                {
+                    var currentUser = _userRepository.FindByUserName(model.UserName);
+                    _adminSession.SetCurrentUser(currentUser);
+                    return RedirectToAction("Index", "Task", new { userId = currentUser.Id, userName = currentUser.UserName });
+                }
             }
-
             return View(model);
         }
 
@@ -61,19 +63,18 @@ namespace TaskManager.MVC.Web.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(UserModel model)
+        public IActionResult Register(UserModel model)
         {
             if (ModelState.IsValid)
             {
-                var users = from user in _context.Users select user;
-                var current = users.FirstOrDefault(user => user.UserName == model.UserName);
-                if (current != null)
+                var user = _userRepository.FindByUserName(model.UserName);
+                if (user != null)
                 {
                     return Register("UserName exist!");
                 }
-                _context.Add(model);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Task", new { userId = current.Id, userName = current.UserName });
+                _userRepository.AddOrUpate(model);
+                _adminSession.SetCurrentUser(user);
+                return RedirectToAction("Index", "Task", new { userId = user.Id, userName = user.UserName });
             }
 
             return View(model);

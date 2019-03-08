@@ -1,43 +1,44 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using TaskManager.MVC.Web.Models;
+using TaskManager.MVC.Web.Repositories;
 using TaskManager.MVC.Web.ViewModels;
 
 namespace TaskManager.MVC.Web.Controllers
 {
     public class TaskController : Controller
     {
-        private readonly TaskContext _context;
+        private readonly ITaskRepository _taskRepository;
 
-        public TaskController(TaskContext context)
+        public TaskController(ITaskRepository repository)
         {
-            _context = context;
+            _taskRepository = repository;
         }
 
-        public async Task<IActionResult> Index(int userId, string userName)
+        public IActionResult Index(int userId, string userName, string searchString)
         {
-            if(userName != null)
+            if (userName != null)
             {
                 ViewData["UserName"] = userName;
                 ViewData["UserId"] = userId;
             }
-            return View(await _context.Tasks.ToListAsync());
+
+            if (searchString != null)
+                return View(_taskRepository.FindAllByType(searchString));
+
+            return View(_taskRepository.FindAll());
         }
 
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var taskModel = await _context.Tasks
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var taskModel = _taskRepository.FindOne((int)id);
             if (taskModel == null)
             {
                 return NotFound();
@@ -55,11 +56,11 @@ namespace TaskManager.MVC.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UpdateTaskViewModel taskModel, int userId, string userName)
+        public IActionResult Create(UpdateTaskViewModel taskModel, int userId, string userName)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(new TaskModel()
+                _taskRepository.AddOrUpate(new TaskModel()
                 {
                     CreateTime = DateTime.Now,
                     Description = taskModel.Description,
@@ -68,21 +69,28 @@ namespace TaskManager.MVC.Web.Controllers
                     Tag = taskModel.Tag,
                     Type = taskModel.Type
                 });
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index), new { userId, userName });
             }
             return View(taskModel);
         }
 
-        // GET: Task/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int userId, string userName, int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var taskModel = await _context.Tasks.FindAsync(id);
+            ViewData["UserName"] = userName;
+            ViewData["UserId"] = userId;
+            var task = _taskRepository.FindOne((int)id);
+            UpdateTaskViewModel taskModel = new UpdateTaskViewModel()
+            {
+                Id = task.Id,
+                Description = task.Description,
+                Status = task.Status,
+                Tag = task.Tag,
+                Type = task.Type
+            };
             if (taskModel == null)
             {
                 return NotFound();
@@ -90,12 +98,9 @@ namespace TaskManager.MVC.Web.Controllers
             return View(taskModel);
         }
 
-        // POST: Task/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Description,Owner,Status,Tag,Type,CreateTime")] TaskModel taskModel)
+        public IActionResult Edit(int userId, string userName, int id, [Bind("Id,Description,Owner,Status,Tag,Type,CreateTime")] UpdateTaskViewModel taskModel)
         {
             if (id != taskModel.Id)
             {
@@ -104,37 +109,27 @@ namespace TaskManager.MVC.Web.Controllers
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(taskModel);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TaskModelExists(taskModel.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                var task = _taskRepository.FindOne(taskModel.Id);
+                task.Description = taskModel.Description;
+                task.Status = taskModel.Status;
+                task.Tag = taskModel.Tag;
+                task.Type = taskModel.Type;
+                _taskRepository.AddOrUpate(task);
+
+                return RedirectToAction(nameof(Index), new { userId, userName });
             }
             return View(taskModel);
         }
 
-        // GET: Task/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int userId, string userName, int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var taskModel = await _context.Tasks
-                .FirstOrDefaultAsync(m => m.Id == id);
+            ViewData["UserName"] = userName;
+            ViewData["UserId"] = userId;
+            var taskModel = _taskRepository.FindOne((int)id);
             if (taskModel == null)
             {
                 return NotFound();
@@ -143,20 +138,13 @@ namespace TaskManager.MVC.Web.Controllers
             return View(taskModel);
         }
 
-        // POST: Task/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(int userId, string userName, int id)
         {
-            var taskModel = await _context.Tasks.FindAsync(id);
-            _context.Tasks.Remove(taskModel);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool TaskModelExists(int id)
-        {
-            return _context.Tasks.Any(e => e.Id == id);
+            var taskModel = _taskRepository.FindOne((int)id);
+            _taskRepository.Delete(taskModel);
+            return RedirectToAction(nameof(Index), new { userId, userName });
         }
     }
 }
