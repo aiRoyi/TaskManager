@@ -21,11 +21,6 @@ namespace TaskManager.MVC.Web.Controllers
             _adminSession = adminSession;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Login(string returnUrl = null)

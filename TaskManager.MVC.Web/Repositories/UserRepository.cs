@@ -14,6 +14,8 @@ namespace TaskManager.MVC.Web.Repositories
         void AddOrUpate(UserModel model);
 
         bool IsValid(string userName, string password);
+
+        List<UserModel> FindAll();
     }
 
     public class UserRepository : IUserRepository
@@ -39,6 +41,19 @@ namespace TaskManager.MVC.Web.Repositories
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
+            }
+        }
+
+        public List<UserModel> FindAll()
+        {
+            try
+            {
+                return _dbContext.Users.ToList();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return null;
             }
         }
 

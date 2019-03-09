@@ -5,7 +5,6 @@ F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\bin\Release\netcoreapp2.2\TaskMana
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\bin\Release\netcoreapp2.2\TaskManager.MVC.Web.pdb
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\bin\Release\netcoreapp2.2\TaskManager.MVC.Web.Views.dll
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\bin\Release\netcoreapp2.2\TaskManager.MVC.Web.Views.pdb
-F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.csprojAssemblyReference.cache
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.csproj.CoreCompileInputs.cache
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.RazorAssemblyInfo.cache
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.RazorAssemblyInfo.cs
@@ -35,3 +34,4 @@ F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskMana
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.dll
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.pdb
 F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.csproj.CopyComplete
+F:\C#\ASP.NET\TaskManager\TaskManager.MVC.Web\obj\Release\netcoreapp2.2\TaskManager.MVC.Web.csprojAssemblyReference.cache
