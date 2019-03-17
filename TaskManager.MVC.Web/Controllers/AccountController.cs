@@ -68,8 +68,8 @@ namespace TaskManager.MVC.Web.Controllers
                     return Register("UserName exist!");
                 }
                 _userRepository.AddOrUpate(model);
-                _adminSession.SetCurrentUser(user);
-                return RedirectToAction("Index", "Task", new { userId = user.Id, userName = user.UserName });
+                _adminSession.SetCurrentUser(model);
+                return RedirectToAction("Index", "Task", new { userId = model.Id, userName = model.UserName });
             }
 
             return View(model);
